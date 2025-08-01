@@ -4,9 +4,9 @@ import com.kenstudy.account.AccountBalanceDTO;
 import com.kenstudy.account.DebitAndCreditResponseDTO;
 import com.kenstudy.account_service.exception.AccountNotFoundException;
 import com.kenstudy.account_service.exception.BalanceNotFound;
-import com.kenstudy.account_service.model.AccountBalance;
+import com.kenstudy.account_service.model.Balance;
 import com.kenstudy.account_service.model.Accounts;
-import com.kenstudy.account_service.repository.AccountBalanceRepository;
+import com.kenstudy.account_service.repository.BalanceRepository;
 import com.kenstudy.account_service.repository.AccountRepository;
 import com.kenstudy.account_service.service.AccountService;
 import com.kenstudy.account_service.utils.AccountType;
@@ -25,13 +25,13 @@ import java.util.Random;
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
-    private final AccountBalanceRepository balanceRepository;
+    private final BalanceRepository balanceRepository;
     private final CustomerExistsHelper customerExistsHelper;
     private final TransactionalOperator txOperator;
 
 
     public AccountServiceImpl(AccountRepository accountRepository,
-              AccountBalanceRepository balanceRepository, CustomerExistsHelper customerExistsHelper,
+                              BalanceRepository balanceRepository, CustomerExistsHelper customerExistsHelper,
                               TransactionalOperator txOperator) {
         this.accountRepository = accountRepository;
         this.balanceRepository = balanceRepository;
@@ -77,7 +77,7 @@ public class AccountServiceImpl implements AccountService {
 
     private Mono<DebitAndCreditResponseDTO> transferFund(AccountBalanceDTO acctBalDTO,
                                                          PaymentRequestDTO payResquestDto) {
-        return customerExistsHelper.checkCustomerExists(payResquestDto.getCustomerId(), acctBalDTO.getAccountId())
+            return customerExistsHelper.checkCustomerExists(payResquestDto.getCustomerId(), acctBalDTO.getAccountId())
                 .flatMap(exists -> {
                     if (!exists) {
                         return Mono.error(
@@ -90,7 +90,7 @@ public class AccountServiceImpl implements AccountService {
                         return Mono.error(new BalanceNotFound("Error: Insufficient balance"));
                     }
 
-                    Mono<AccountBalance> debit = balanceRepository.findById(acctBalDTO.getAccountId())
+                    Mono<Balance> debit = balanceRepository.findById(acctBalDTO.getAccountId())
                             .switchIfEmpty(Mono.error(new AccountNotFoundException("Account Id does not exist")))
                             .flatMap(balance -> {
                                 double updatedDebitBalance = balance.debitAcctBalance(payResquestDto.getAmount());
@@ -99,7 +99,7 @@ public class AccountServiceImpl implements AccountService {
                                 return balanceRepository.save(balance);
                             });
 
-                    Mono<AccountBalance> credit = balanceRepository.findById(payResquestDto.getRecipientId())
+                    Mono<Balance> credit = balanceRepository.findById(payResquestDto.getRecipientId())
                             .switchIfEmpty(Mono.error(new BalanceNotFound("Recipient with Account Id "
                                     + payResquestDto.getRecipientId() + " does not exist")))
                             .flatMap(recipientAcct -> {
@@ -134,9 +134,9 @@ public class AccountServiceImpl implements AccountService {
     // Helper to create and save account balance
     @Transactional
     private Mono<AccountBalanceDTO> mapToCreateBalanceDTO(Accounts savedAccount) {
-        AccountBalance balance = new AccountBalance();
+        Balance balance = new Balance();
         savedAccount.initializeAccountBalance(10.00);
-        AccountBalance initialBalance = savedAccount.getBalance().getFirst();
+        Balance initialBalance = savedAccount.getBalance().getFirst();
         balance.setAccountId(savedAccount.getId());
         balance.setBalance(initialBalance.getBalance());
         balance.setRecordedAt(initialBalance.getRecordedAt());
@@ -153,7 +153,7 @@ public class AccountServiceImpl implements AccountService {
                 });
     }
 
-    private DebitAndCreditResponseDTO mapPaymentResDto(AccountBalance debit, AccountBalance credit,
+    private DebitAndCreditResponseDTO mapPaymentResDto(Balance debit, Balance credit,
                                                        PaymentRequestDTO paymentRequestDTO) {
         DebitAndCreditResponseDTO dto = new DebitAndCreditResponseDTO();
         dto.setSenderAccountId(debit.getAccountId());
@@ -164,7 +164,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
 
-    private AccountBalanceDTO mapToGetBalance(Accounts accounts, AccountBalance balance) {
+    private AccountBalanceDTO mapToGetBalance(Accounts accounts, Balance balance) {
         AccountBalanceDTO balanceDTO = new AccountBalanceDTO();
         balanceDTO.setAccountId(accounts.getId());
         balanceDTO.setAccountNumber(accounts.getAccountNumber());

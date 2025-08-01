@@ -4,6 +4,7 @@ import com.kenstudy.account_service.exception.AccountNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -12,20 +13,22 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table("acct_balance")
-public class AccountBalance {
+@Table("balance")
+@Slf4j
+public class Balance {
     @Id
     private Integer id;
     private Double balance;
     private Integer accountId;
     private LocalDate recordedAt;
 
-    public Double debitAcctBalance(Double balance){
+    public boolean checkAcctBalance(Double balance){
         double acctBal = this.balance - balance;
-        if (acctBal < 5.00) {
-            throw new AccountNotFoundException("Account balance must not be less than $5 ");
-        }
-        return acctBal;
+        return (acctBal > 5.00);
+    }
+
+    public Double debitAcctBalance(Double balance){
+        return this.balance - balance;
 
     }
 

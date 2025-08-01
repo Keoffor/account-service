@@ -1,7 +1,6 @@
 package com.kenstudy.account_service.model;
 
 
-import com.kenstudy.account_service.utils.AccountType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,14 +22,14 @@ public class Accounts {
     private String accountType;
     private Integer customersId;
     @Transient
-    private List<AccountBalance> balance = new ArrayList<>();
+    private List<Balance> balance = new ArrayList<>();
 
-    public List<AccountBalance> getBalance() {
+    public List<Balance> getBalance() {
         return balance == null ? new ArrayList<>(): balance;
     }
 
     public void initializeAccountBalance(double initialBalance) {
-        AccountBalance balance = new AccountBalance();
+        Balance balance = new Balance();
         balance.setBalance(initialBalance);
         balance.setRecordedAt(LocalDate.now());
 
