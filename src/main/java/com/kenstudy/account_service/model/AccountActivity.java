@@ -20,5 +20,6 @@ public class AccountActivity {
     private Double amount;
     private String type;
     private String status;
+    private boolean isClosed;
     private LocalDateTime dateTime;
 }
