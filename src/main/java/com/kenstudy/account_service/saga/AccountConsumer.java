@@ -3,12 +3,14 @@ package com.kenstudy.account_service.saga;
 import com.kenstudy.event.AccountEvent;
 import com.kenstudy.event.TransactEvent;
 
+import com.kenstudy.payment.PaymentRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -30,14 +32,10 @@ public class AccountConsumer {
         return this.handler.processTransfer(transactEvent);
     }
 
-
     @Bean
-    public Consumer<AccountEvent> consumeAccountEvent(){
-        //listen to customer topic
-        //check request created
-        //if transfer request created proceed to initiate transaction
-        //if transfer request status is failed, update transaction as failed.
+    public BiConsumer<PaymentRequestDTO, String> updateTransactAcct() {
         return handler::updateTransactAcct;
     }
+
 
 }
