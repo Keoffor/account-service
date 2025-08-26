@@ -10,11 +10,22 @@ spring:
     username: root
     password: root
     url: r2dbc:mysql://localhost:3307/patient_db
-#  liquibase:
-#    url: jdbc:mysql://localhost:3307/patient_db
-#    user: root
-#    password: root
-#    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+
+  cloud:
+    function:
+      definition: processTransferFund
+    stream:
+      bindings:
+        processTransferFund-in-0:
+          destination: transactEvent
+        processTransferFund-out-0:
+          destination: accountEventSuccess
+        accountEventFailure-out-0:
+          destination: accountEventFailure
+      kafka:
+        binder:
+          brokers: localhost:9092
 logging:
   level:
     root: info

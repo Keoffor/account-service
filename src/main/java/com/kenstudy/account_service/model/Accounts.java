@@ -1,6 +1,7 @@
 package com.kenstudy.account_service.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,7 +22,7 @@ public class Accounts {
     private String accountNumber;
     private String accountType;
     private Integer customersId;
-    @Transient
+    @JsonIgnore
     private List<Balance> balance = new ArrayList<>();
 
     public List<Balance> getBalance() {

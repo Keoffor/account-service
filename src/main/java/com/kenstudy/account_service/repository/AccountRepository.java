@@ -14,6 +14,4 @@ import java.util.List;
 public interface AccountRepository extends ReactiveCrudRepository<Accounts, Integer> {
  Mono<Boolean> existsByCustomersId(Integer customerId);
 
- @Query("SELECT a FROM account a WHERE a.id IN (:ids)")
- Flux<Accounts> findSenderAndReceiverAccts(@Param("ids") List<Integer> ids);
 }

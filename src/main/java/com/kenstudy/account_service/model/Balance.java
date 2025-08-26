@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDate;
@@ -13,27 +14,35 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table("balance")
+@Table("acct_balance")
 @Slf4j
 public class Balance {
+
     @Id
     private Integer id;
+
     private Double balance;
+
+    @Column("account_id") // ✅ match the DB column name exactly
     private Integer accountId;
+
+    @Column("recorded_at") // optional if DB column is snake_case
     private LocalDate recordedAt;
 
-    public boolean checkAcctBalance(Double balance){
+    public boolean checkAcctBalance(Double balance) {
         double acctBal = this.balance - balance;
         return (acctBal > 5.00);
     }
 
-    public Double debitAcctBalance(Double balance){
-        return this.balance - balance;
-
+    public Double debitAcctBalance(Double amount) {
+        this.balance = this.balance - amount; // ✅ update the actual field
+        return this.balance;
     }
 
-    public Double creditAccount(Double balance){
-        return this.balance + balance;
+    public Double creditAccount(Double amount) {
+        this.balance = this.balance + amount; // ✅ update the actual field
+        return this.balance;
     }
+
 
 }
